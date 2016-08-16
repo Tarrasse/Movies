@@ -1,0 +1,105 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mahmoud.movies.MoviesFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pupular"
+                android:id="@+id/popular_button"
+                android:layout_weight="1"
+                android:padding="0dp"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Top Rated"
+                android:id="@+id/top_rated_button"
+                android:layout_weight="1"
+                android:padding="0dp"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="favourite"
+                android:id="@+id/fav_button"
+                android:layout_weight="1"
+                android:padding="0dp"/>
+
+        </LinearLayout>
+
+        <!--<LinearLayout-->
+            <!--android:orientation="horizontal"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+
+
+            <!--<RadioButton-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Pupular"-->
+                <!--android:id="@+id/popular_radio_button"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_weight="1" />-->
+
+            <!--<RadioButton-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Top Rated"-->
+                <!--android:id="@+id/top_rated_radio_button"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_weight="1" />-->
+            <!--<RadioButton-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="favourite"-->
+                <!--android:id="@+id/fav_radio_button"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_weight="1" />-->
+
+        <!--</LinearLayout>-->
+
+        <GridView
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/movies_gridView"
+            android:layout_gravity="center_horizontal"
+            android:horizontalSpacing="0dp"
+            android:verticalSpacing="10dp"
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
+            android:layout_marginTop="20dp" />
+
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/no_content_palce_holder">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="no content to show yet !... "
+            android:textAllCaps="true"
+            android:layout_gravity="center"
+            android:textSize="20dp"/>
+    </FrameLayout>
+</RelativeLayout>
