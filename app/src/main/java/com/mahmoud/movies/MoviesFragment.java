@@ -21,7 +21,7 @@ import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.RadioButton;
 
-import com.mahmoud.movies.data.DataTask;
+
 import com.mahmoud.movies.data.MoviesContract;
 
 
@@ -75,6 +75,9 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_movies, container, false);
+
+        if (savedInstanceState == null)
+            sort = 1;
 
         mAdapter = new MoviesAdapter(getActivity(), null, 1);
 

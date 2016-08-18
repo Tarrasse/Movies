@@ -89,7 +89,7 @@
                             android:layout_width="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:layout_height="wrap_content"
-                            android:text="favourit"
+                            android:text="favorite"
                             android:background="@color/gray_red"
                             android:id="@+id/fav_button"
                             />
@@ -138,13 +138,18 @@
                     android:id="@+id/detail_reviews_tv"
                     android:visibility="gone"/>
 
-
-
-                <ListView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/reviews_list_view"
-                    ></ListView>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/list_view_replacement"></LinearLayout>
+
+                <!--<ListView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:id="@+id/reviews_list_view"-->
+                    <!--android:clickable="true"-->
+                    <!--android:nestedScrollingEnabled="true"></ListView>-->
 
 
 

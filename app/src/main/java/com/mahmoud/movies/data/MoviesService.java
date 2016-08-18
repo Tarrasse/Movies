@@ -1,12 +1,16 @@
 package com.mahmoud.movies.data;
 
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.mahmoud.movies.modules.Movies;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,24 +20,25 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import com.mahmoud.movies.data.MoviesContract.*;
-import com.mahmoud.movies.modules.Movies;
-
 /**
- * Created by mahmoud on 8/8/2016.
+ * An {@link IntentService} subclass for handling asynchronous task requests in
+ * a service on a separate handler thread.
+ * <p>
+ * TODO: Customize class - update intent actions, extra parameters and static
+ * helper methods.
  */
-public class DataTask extends AsyncTask <Integer, Void, Void>  {
+public class MoviesService extends IntentService {
 
-    private Context mContext;
-
-    public DataTask(Context context) {
-        mContext = context;
+    public MoviesService() {
+        super("MoviesService");
     }
 
-    @Override
-    protected Void doInBackground(Integer... params) {
+    public static final String QUERY_PARAM = "qp";
 
-        String LOG_TAG = DataTask.class.getSimpleName();
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        String LOG_TAG = MoviesService.class.getSimpleName();
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -47,7 +52,7 @@ public class DataTask extends AsyncTask <Integer, Void, Void>  {
             String popular = "http://api.themoviedb.org/3/movie/popular?api_key=7332c3e1c7f02f72c3edbc3d8f982342";
             String top_rated = "http://api.themoviedb.org/3/movie/top_rated?api_key=7332c3e1c7f02f72c3edbc3d8f982342";
             String uri = null;
-            if(params[0] == 1 ){
+            if(intent.getIntExtra(QUERY_PARAM, 1) == 1 ){
                 uri = popular;
             }else{
                 uri = top_rated;
@@ -86,13 +91,15 @@ public class DataTask extends AsyncTask <Integer, Void, Void>  {
             Log.d(LOG_TAG,"Json input : " + resultStr);
 
 
-            Movies movies = new Movies();
+            Movies movies ;
             Gson gson =  new Gson();
             movies =  gson.fromJson(resultStr, Movies.class);
-            insertDataToDataBase(movies, params[0]);
+            Log.i(LOG_TAG, resultStr);
+            insertDataToDataBase(movies, intent.getIntExtra(QUERY_PARAM, 1));
 
         } catch (IOException e) {
             Log.e("PlaceholderFragment", "Error ", e);
+            Toast.makeText(this, "CONNECTION ERROR", Toast.LENGTH_LONG).show();
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
 
@@ -109,37 +116,33 @@ public class DataTask extends AsyncTask <Integer, Void, Void>  {
             }
         }
 
-
-
-        return null;
     }
-
     public void insertDataToDataBase (Movies movies, int x ){
-        SQLiteDatabase db = new MoviesDBHelper(mContext).getReadableDatabase();
+//        SQLiteDatabase db = new MoviesDBHelper(this).getReadableDatabase();
         ArrayList<Movies.ResultsBean> moviesList = movies.getResults();
         ContentValues values = new ContentValues();
         if (x == 1){
-            mContext.getContentResolver().delete(PopularTable.CONTENT_URI, null, null);
+            getContentResolver().delete(MoviesContract.PopularTable.CONTENT_URI, null, null);
         }else{
-            mContext.getContentResolver().delete(RatedTable.CONTENT_URI, null, null);
+            getContentResolver().delete(MoviesContract.RatedTable.CONTENT_URI, null, null);
         }
 
         for (int i = 0; i < moviesList.size() ; i++) {
             Log.i("inserting data : " , moviesList.get(i).getTitle());
-            values.put(RatedTable.TITLE, moviesList.get(i).getTitle() );
-            values.put(RatedTable.POSTER_PATH, moviesList.get(i).getPoster_path() );
-            values.put(RatedTable.RELEASE_DATE, moviesList.get(i).getRelease_date() );
-            values.put(RatedTable.OVERVIEW, moviesList.get(i).getOverview());
-            values.put(RatedTable.ID, moviesList.get(i).getId());
-            values.put(RatedTable.VOTE, moviesList.get(i).getVote_average());
+            values.put(MoviesContract.RatedTable.TITLE, moviesList.get(i).getTitle() );
+            values.put(MoviesContract.RatedTable.POSTER_PATH, moviesList.get(i).getPoster_path() );
+            values.put(MoviesContract.RatedTable.RELEASE_DATE, moviesList.get(i).getRelease_date() );
+            values.put(MoviesContract.RatedTable.OVERVIEW, moviesList.get(i).getOverview());
+            values.put(MoviesContract.RatedTable.ID, moviesList.get(i).getId());
+            values.put(MoviesContract.RatedTable.VOTE, moviesList.get(i).getVote_average());
             if(x == 1){
-                mContext.getContentResolver().insert(
-                        PopularTable.CONTENT_URI,
+                getContentResolver().insert(
+                        MoviesContract.PopularTable.CONTENT_URI,
                         values
                 );
             }else{
-                mContext.getContentResolver().insert(
-                        RatedTable.CONTENT_URI,
+                getContentResolver().insert(
+                        MoviesContract.RatedTable.CONTENT_URI,
                         values
                 );
             }
@@ -147,5 +150,19 @@ public class DataTask extends AsyncTask <Integer, Void, Void>  {
         }
 
     }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent popIntent = new Intent(context, MoviesService.class);
+            popIntent.putExtra(MoviesService.QUERY_PARAM, 1);
+            context.startService(popIntent);
+            Intent ratedIntent = new Intent(context, MoviesService.class);
+            ratedIntent.putExtra(MoviesService.QUERY_PARAM, 2);
+            context.startService(ratedIntent);
+        }
+    }
+
 
 }

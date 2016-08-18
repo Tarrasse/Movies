@@ -1,7 +1,6 @@
 package com.mahmoud.movies;
 
 
-import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -14,10 +13,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.provider.ContactsContract;
 import android.app.LoaderManager;
 import android.content.Loader;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +23,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,10 +33,9 @@ import android.widget.VideoView;
 import com.google.gson.Gson;
 import com.mahmoud.movies.data.MoviesContract;
 
-import com.mahmoud.movies.DetailFragment.ReviewsTask;
 import com.mahmoud.movies.data.MoviesDBHelper;
-import com.mahmoud.movies.data.Reviews;
-import com.mahmoud.movies.data.Videos;
+import com.mahmoud.movies.modules.Reviews;
+import com.mahmoud.movies.modules.Videos;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;
@@ -70,6 +66,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mReviewTV;
     private TextView mVedioTV;
     private ScrollView mScroll;
+    private ListView lv;
+    private LinearLayout mList;
 
     private reviewsAdapter adapter ;
 
@@ -124,14 +122,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         View rootView =  inflater.inflate(R.layout.fragment_detail, container, false);
 
-        adapter = new reviewsAdapter(getActivity(), R.id.reviews_list_view, new ArrayList());
-
-        ListView lv = (ListView) rootView.findViewById(R.id.reviews_list_view);
-        lv.setAdapter(adapter);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            lv.setNestedScrollingEnabled(true);
-        }
-
+//        adapter = new reviewsAdapter(getActivity(), R.id.reviews_list_view, new ArrayList());
+//
+//        lv = (ListView) rootView.findViewById(R.id.reviews_list_view);
+//        lv.setAdapter(adapter);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            lv.setNestedScrollingEnabled(true);
+//        }
+        mList = (LinearLayout) rootView.findViewById(R.id.list_view_replacement);
         mFAVButton = (Button) rootView.findViewById(R.id.fav_button);
         mNameTextView = (TextView) rootView.findViewById(R.id.movie_name_text_View);
         mDateTextView = (TextView) rootView.findViewById(R.id.movie_date_textView);
@@ -141,7 +139,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         vediosListVoew = (ListView)rootView.findViewById(R.id.trailers_list_view);
         videos_Adapter = new ArrayAdapter<String>(
                 getActivity(),
-                android.R.layout.simple_list_item_1,
+                R.layout.vedio_list_item,
                 new ArrayList<String>()
         );
         vediosListVoew.setAdapter(videos_Adapter);
@@ -157,7 +155,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             public void onClick(View v) {
                 System.out.println(fav);
                 if (!fav) {
-                    SQLiteDatabase db = new MoviesDBHelper(getActivity()).getReadableDatabase();
 
                     ContentValues values = new ContentValues();
                     values.put(MoviesContract.PopularTable.OVERVIEW, mOverView);
@@ -233,21 +230,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
         try{
             data.move(mposition);
+            mPosrPath = data.getString(COL_POSTER_PATH);
+            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/" + data.getString(DetailFragment.COL_POSTER_PATH)).into(mPosterImageView);
+            mOverView = data.getString(COL_OVERVIEW);
+            mTitle = data.getString(COL_TITLE);
+            mDate = data.getString(COL_DATE);
+            mVote = data.getString(COL_VOTE);
+            mNameTextView.setText(mTitle);
+            mOverViewTextView.setText(mOverView);
+            mDateTextView.setText(mDate);
+            mRateTextView.setText(mVote + " / 10");
+            mMovieID = data.getString(COL_ID);
 
         }catch (Exception e){
             System.out.println(e);
         }
-        mPosrPath = data.getString(COL_POSTER_PATH);
-        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/" + data.getString(DetailFragment.COL_POSTER_PATH)).into(mPosterImageView);
-        mOverView = data.getString(COL_OVERVIEW);
-        mTitle = data.getString(COL_TITLE);
-        mDate = data.getString(COL_DATE);
-        mVote = data.getString(COL_VOTE);
-        mNameTextView.setText(mTitle);
-        mOverViewTextView.setText(mOverView);
-        mDateTextView.setText(mDate);
-        mRateTextView.setText(mVote + " / 10");
-        mMovieID = data.getString(COL_ID);
+
 
         SQLiteDatabase db;
         try {
@@ -379,12 +377,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
         @Override
-        protected void onPostExecute(Reviews reviews) {
+        protected void onPostExecute(final Reviews reviews) {
             super.onPostExecute(reviews);
             if (reviews != null){
-                if(!(reviews.getResults().size() <1)){
+                if((reviews.getResults().size() > 0)){
+
                     mReviewTV.setVisibility(View.VISIBLE);
-                    adapter.addAll(reviews.getResults());
+
+                    reviewsAdapter ad = new reviewsAdapter(getActivity(),R.layout.review_list_item, reviews.getResults());
+
+                    for (int i = 0; i < ad.getCount() ; i++) {
+                        View v = ad.getView(i, null, mList);
+                        mList.addView(v);
+
+                    }
+
+//                    adapter.addAll(reviews.getResults());
+//
+//                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                        @Override
+//                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                            Log.i("vedios task" , reviews.getResults().get(position).getUrl());
+//                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(reviews.getResults().get(position).getUrl())));
+//                        }
+//                    });
+
                     mScroll.scrollTo(0,0);
 
 
@@ -487,12 +504,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             if (videos != null){
 
                 mVedioTV.setVisibility(View.VISIBLE);
+
                 final List<Videos.ResultsBean> res = videos.getResults();
+
                 ArrayList<String> vediosNames = new ArrayList<>();
+
                 vediosNames.clear();
                 for (int i = 0; i <res.size() ; i++) {
                     vediosNames.add(res.get(i).getName());
                 }
+
                 videos_Adapter.clear();
                 videos_Adapter.addAll(vediosNames);
 

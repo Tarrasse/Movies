@@ -1,4 +1,4 @@
-package com.mahmoud.movies.data;
+package com.mahmoud.movies.modules;
 
 import java.util.List;
 

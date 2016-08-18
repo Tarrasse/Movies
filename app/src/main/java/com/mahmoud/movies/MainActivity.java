@@ -1,6 +1,9 @@
 package com.mahmoud.movies;
 
+import android.app.AlarmManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -8,8 +11,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mahmoud.movies.data.DataTask;
 import com.mahmoud.movies.data.MoviesContract;
+import com.mahmoud.movies.data.MoviesService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,10 +28,17 @@ public class MainActivity extends AppCompatActivity {
         int pos ;
         int sort;
         if (savedInstanceState == null){
-            DataTask task = new DataTask(this);
-            task.execute(1);
-            DataTask task1 = new DataTask(this);
-            task1.execute(2);
+//            DataTask task = new DataTask(this);
+//            task.execute(1);
+//            DataTask task1 = new DataTask(this);
+//            task1.execute(2);
+
+            Intent alarmIntent = new Intent(this, MoviesService.AlarmReceiver.class);
+
+            PendingIntent pi = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+            AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+            am.setRepeating(AlarmManager.RTC,System.currentTimeMillis(), AlarmManager.INTERVAL_HOUR, pi);
+
         }else {
             pos = savedInstanceState.getInt(DetailFragment.POSITION);
             sort = savedInstanceState.getInt("sort");
@@ -87,10 +97,16 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh  ) {
-            DataTask task = new DataTask(this);
-            task.execute(1);
-            DataTask task1 = new DataTask(this);
-            task1.execute(2);
+//            DataTask task = new DataTask(this);
+//            task.execute(1);
+//            DataTask task1 = new DataTask(this);
+//            task1.execute(2);
+            Intent popIntent = new Intent(this, MoviesService.class);
+            popIntent.putExtra(MoviesService.QUERY_PARAM, 1);
+            startService(popIntent);
+            Intent ratedIntent = new Intent(this, MoviesService.class);
+            ratedIntent.putExtra(MoviesService.QUERY_PARAM, 2);
+            startService(ratedIntent);
         }
         return super.onOptionsItemSelected(item);
     }
