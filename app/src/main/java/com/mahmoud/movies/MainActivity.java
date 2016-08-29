@@ -33,11 +33,19 @@ public class MainActivity extends AppCompatActivity {
 //            DataTask task1 = new DataTask(this);
 //            task1.execute(2);
 
+            Intent popIntent = new Intent(this, MoviesService.class);
+            popIntent.putExtra(MoviesService.QUERY_PARAM, 1);
+            startService(popIntent);
+            Intent ratedIntent = new Intent(this, MoviesService.class);
+            ratedIntent.putExtra(MoviesService.QUERY_PARAM, 2);
+            startService(ratedIntent);
+
             Intent alarmIntent = new Intent(this, MoviesService.AlarmReceiver.class);
 
             PendingIntent pi = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
             AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-            am.setRepeating(AlarmManager.RTC,System.currentTimeMillis(), AlarmManager.INTERVAL_HOUR, pi);
+
+            am.setRepeating(AlarmManager.RTC,System.currentTimeMillis()+ AlarmManager.INTERVAL_HOUR, AlarmManager.INTERVAL_HOUR, pi);
 
         }else {
             pos = savedInstanceState.getInt(DetailFragment.POSITION);

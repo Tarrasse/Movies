@@ -228,6 +228,11 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         return rootView;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

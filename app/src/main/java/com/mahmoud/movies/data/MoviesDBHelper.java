@@ -61,7 +61,7 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CreatePopularTable);
         db.execSQL(CreateRateTable);
-        db.execSQL(CreateReviewsTable);
+//        db.execSQL(CreateReviewsTable);
         db.execSQL(CreateFAVTable);
     }
 
@@ -69,7 +69,7 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + RatedTable.TABLE_NAME + " ;");
         db.execSQL("DROP TABLE IF EXISTS " + PopularTable.TABLE_NAME + " ;");
-        db.execSQL("DROP TABLE IF EXISTS " + ReviewsTable.TABLE_NAME + " ;");
+//        db.execSQL("DROP TABLE IF EXISTS " + ReviewsTable.TABLE_NAME + " ;");
         db.execSQL("DROP TABLE IF EXISTS " + FavouriteTable.TABLE_NAME + " ;");
         onCreate(db);
     }
